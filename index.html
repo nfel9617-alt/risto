@@ -1,0 +1,68 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>El Padre Burgers</title><link rel="stylesheet" href="style.css"></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="menu" viewBox="0 0 24 24"><path d="M4 10a8 6 0 0116 0z"/><path d="M3 13.500h18M5 17h14M6 17a2 2 0 002 2h8a2 2 0 002-2"/></symbol>
+<symbol id="comments" viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-11.500 7.200L3 21l1.800-6A8 8 0 1121 12z"/><path d="M8 11h8M8 14h5"/></symbol>
+<symbol id="delivery" viewBox="0 0 24 24"><circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M9 17h6M6 14l3-7h4l2 4h3M13 7h2"/></symbol>
+<symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.300-4.300"/></symbol>
+<symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.500 1.500a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></symbol>
+<symbol id="pin" viewBox="0 0 24 24"><path d="M12 21s7-6.200 7-11.500A7 7 0 005 9.500C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.500" r="2.500"/></symbol>
+<symbol id="send" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></symbol>
+<symbol id="check" viewBox="0 0 24 24"><path d="M5 12.500l4.500 4.500L19 7.500"/></symbol>
+<symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="Burgers" viewBox="0 0 24 24"><path d="M4 10a8 6 0 0116 0z"/><path d="M3 13.500h18M5 17h14M6 17a2 2 0 002 2h8a2 2 0 002-2"/></symbol>
+<symbol id="Sandwichs" viewBox="0 0 24 24"><path d="M3 9l9-5 9 5-9 5z"/><path d="M3 13l9 5 9-5"/></symbol>
+<symbol id="Menu Enfant" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.500 14a4 4 0 007 0M9 9.500h.01M15 9.500h.01"/></symbol>
+<symbol id="Tacos" viewBox="0 0 24 24"><path d="M3 18a9 9 0 0118 0z"/><path d="M7 15l1-2.500M11 15l1-4M15 15l1-2.500"/></symbol>
+<symbol id="Salade" viewBox="0 0 24 24"><path d="M5 19c0-8 5-14 15-14 0 10-6 15-14 15"/><path d="M5 19L14 10"/></symbol>
+<symbol id="Bowl" viewBox="0 0 24 24"><path d="M3 11h18a9 8 0 01-18 0z"/><path d="M8 7c0-2 2-2 2-4M13 7c0-2 2-2 2-4"/></symbol>
+<symbol id="Pizzas" viewBox="0 0 24 24"><path d="M12 21L3.500 6a15 15 0 0117 0z"/><circle cx="10" cy="9" r="1"/><circle cx="14" cy="11" r="1"/><circle cx="12" cy="15" r="1"/></symbol>
+<symbol id="Boissons" viewBox="0 0 24 24"><path d="M6 7h12l-1.500 14h-9zM5 7h14M13 7l2-4h3"/></symbol>
+</defs></svg>
+<aside><div class="brand"><div class="logo"><img src="logo.png" alt="" onerror="this.remove()"><svg class="i"><use href="#Burgers"/></svg></div><b>El Padre<br>Burgers</b></div>
+<button data-p="menu" class="on"><span class="gi"><svg class="i"><use href="#menu"/></svg></span>Menu</button>
+<button data-p="comments"><span class="gi"><svg class="i"><use href="#comments"/></svg></span>Comments</button>
+<button data-p="delivery"><span class="gi"><svg class="i"><use href="#delivery"/></svg></span>Delivery</button>
+<div class="foot">Fait maison, servi chaud.</div></aside>
+<main id="m"><div class="grid"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div></main>
+<script src="config.js"></script><script>
+let D={menu:[],comments:[],agencies:[]},page="menu",cat=CATS[0],q="";
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ic=n=>`<svg class="i"><use href="#${n}"/></svg>`;
+const gi=n=>`<span class="gi">${ic(n)}</span>`;
+const m=document.getElementById("m");
+function ago(d){const t=new Date(d);if(isNaN(t))return"";const s=(Date.now()-t)/1000;
+ if(s<3600)return"il y a "+Math.max(1,Math.round(s/60))+" min";if(s<86400)return"il y a "+Math.round(s/3600)+" h";if(s<2592000)return"il y a "+Math.round(s/86400)+" j";return t.toLocaleDateString("fr-FR")}
+function toast(t){const e=document.createElement("div");e.className="toast glass";e.innerHTML=ic("check")+t;document.body.append(e);setTimeout(()=>e.remove(),2600)}
+document.querySelectorAll("aside button").forEach(b=>b.onclick=()=>{page=b.dataset.p;document.querySelectorAll("aside button").forEach(x=>x.classList.toggle("on",x==b));draw();scrollTo(0,0)});
+function draw(){
+ m.style.animation="none";m.offsetHeight;m.style.animation="";
+ if(page=="menu"){
+  const all=D.menu.filter(i=>i.category==cat&&String(i.name).toLowerCase().includes(q));
+  const f=D.menu.find(i=>i.image);
+  m.innerHTML=`<div class="hero"><div><h1>L'art du <i>burger</i>, servi chaud.</h1><p>Des recettes généreuses, préparées à la minute et livrées chez vous.</p>
+  <div class="chips"><span class="chip">${gi("delivery")}Livraison rapide</span><span class="chip">${gi("pin")}${D.agencies.length||12} agences</span></div></div>
+  ${f?`<img class="fl" src="${esc(f.image)}" alt="">`:`<div class="fl ph0">${ic("Burgers")}</div>`}</div>
+  <label class="search glass">${ic("search")}<input id="q" placeholder="Rechercher un plat" value="${esc(q)}"></label>
+  <div class="cats">${CATS.map(c=>`<button class="cat glass ${c==cat?"on":""}" data-c="${c}">${gi(c)}${c}</button>`).join("")}</div>
+  <div class="grid">${all.map((i,n)=>`<div class="card glass" style="--d:${n}">${i.image?`<img class="food" src="${esc(i.image)}" alt="${esc(i.name)}" loading="lazy">`:`<div class="food none">${ic(i.category)}</div>`}<h3>${esc(i.name)}</h3>
+  <div class="row2"><span class="price">${esc(i.price)}<small>DA</small></span><span class="add">${ic("plus")}</span></div></div>`).join("")||'<p class="empty">Aucun plat dans cette catégorie.</p>'}</div>`;
+  m.querySelectorAll(".cat").forEach(b=>b.onclick=()=>{cat=b.dataset.c;draw()});
+  const qi=document.getElementById("q");qi.oninput=()=>{q=qi.value.toLowerCase();const p=qi.selectionStart;draw();const n=document.getElementById("q");n.focus();n.setSelectionRange(p,p)};
+ }else if(page=="comments"){
+  m.innerHTML=`<h2>Votre <em>avis</em> compte</h2><div class="form glass"><h3>Partagez votre expérience</h3><p>Dites-nous ce que vous avez aimé, votre message sera visible par tous.</p>
+  <div class="fld">${ic("pin")}<select id="w">${WILAYAS.map(w=>`<option>${w}</option>`).join("")}</select></div>
+  <div class="fld ta">${ic("comments")}<textarea id="t" rows="4" maxlength="300" placeholder="Écrivez votre message…"></textarea></div>
+  <div class="fb"><span class="cn" id="cn">0 / 300</span><button class="send" id="s">Publier ${ic("send")}</button></div></div>
+  ${D.comments.slice().reverse().map((c,n)=>`<div class="bub glass" style="--d:${n}"><div class="av">${esc(String(c.wilaya)[0]||"?")}</div><div><b>${esc(c.wilaya)}</b><small>${ago(c.date)}</small><p>${esc(c.text)}</p></div></div>`).join("")||'<p class="empty">Soyez le premier à laisser un avis.</p>'}`;
+  const t=document.getElementById("t");t.oninput=()=>document.getElementById("cn").textContent=t.value.length+" / 300";
+  document.getElementById("s").onclick=async e=>{const v=t.value.trim();if(v.length<3){t.focus();return}e.currentTarget.disabled=true;
+   await api.post({action:"comment",wilaya:document.getElementById("w").value,text:v});D=await api.get();draw();toast("Merci, votre avis est publié")};
+ }else{
+  m.innerHTML=`<h2>Livraison <span class="cnt">${D.agencies.length} agences</span></h2><div class="grid" style="padding-top:0;gap:22px">${D.agencies.map((a,n)=>`<div class="dc glass" style="--d:${n}"><div class="dp">${a.image?`<img src="${esc(a.image)}" alt="" loading="lazy">`:ic("pin")}<h3>${esc(a.wilaya)}</h3></div>
+  <div class="db"><div class="ph"><span class="gi">${ic("phone")}</span>${esc(a.phone)}</div>
+  <div class="btns"><a class="btn" href="tel:${esc(a.phone)}">${ic("phone")}Appeler</a>${a.location?`<a class="btn d" href="${esc(a.location)}" target="_blank" rel="noopener">${ic("pin")}Itinéraire</a>`:""}</div></div></div>`).join("")||'<p class="empty">Aucune agence pour le moment.</p>'}</div>`;
+ }}
+api.get().then(d=>{D=d;draw()}).catch(()=>m.innerHTML='<p class="empty">Erreur de connexion à la base de données.</p>');
+</script></body></html>
