@@ -1,0 +1,26 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin · El Padre Burgers</title><link rel="stylesheet" href="style.css"><style>.row{display:flex;gap:10px;align-items:center;border-bottom:1px solid #ddd;padding:6px}.row span{flex:1}.row img{width:40px;height:40px;border-radius:8px;object-fit:cover}.x{background:var(--k);color:var(--b);border:0;border-radius:10px;padding:6px 10px;cursor:pointer}</style></head><body>
+<main><h2>Administration</h2>
+<input id="pw" type="password" placeholder="Mot de passe admin">
+<h3>Menu — ajouter un plat</h3>
+<select id="mc"></select><input id="mn" placeholder="Nom"><input id="mp" type="number" placeholder="Prix (DA)"><input id="mi" type="file" accept="image/*">
+<button class="send" onclick="save('Menu',{category:mc.value,name:mn.value,price:mp.value},mi)">Ajouter</button><div id="lm"></div>
+<h3>Delivery — ajouter une agence</h3>
+<select id="aw"></select><input id="ap" placeholder="+213..."><input id="al" placeholder="Lien Google Maps (Location)"><input id="ai" type="file" accept="image/*">
+<button class="send" onclick="save('Agencies',{wilaya:aw.value,phone:ap.value,location:al.value},ai)">Ajouter</button><div id="la"></div>
+<h3>Comments</h3><div id="lc"></div></main>
+<script src="config.js"></script><script>
+mc.innerHTML=CATS.map(c=>`<option>${c}</option>`).join("");aw.innerHTML=WILAYAS.map(c=>`<option>${c}</option>`).join("");
+const toB64=f=>new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(",")[1]);x.readAsDataURL(f)});
+async function save(sheet,row,fi){
+ const d={action:"save",pass:pw.value,sheet,row};
+ if(fi.files[0]){d.img=await toB64(fi.files[0]);d.mime=fi.files[0].type}
+ const r=await api.post(d);alert(r.error?"Mot de passe incorrect":"OK");load()}
+async function del(sheet,id){if(!confirm("Supprimer ?"))return;const r=await api.post({action:"delete",pass:pw.value,sheet,id});alert(r.error?"Mot de passe incorrect":"OK");load()}
+const R=(s,id,img,t)=>`<div class="row">${img?`<img src="${img}">`:""}<span>${t}</span><button class="x" onclick="del('${s}','${id}')">Supprimer</button></div>`;
+async function load(){const D=await api.get();
+ lm.innerHTML=D.menu.map(i=>R("Menu",i.id,i.image,`${i.category} — ${i.name} — ${i.price} DA`)).join("");
+ la.innerHTML=D.agencies.map(i=>R("Agencies",i.id,i.image,`${i.wilaya} — ${i.phone}`)).join("");
+ lc.innerHTML=D.comments.map(i=>R("Comments",i.id,"",`${i.name||"Client"} (${i.wilaya}) ${"★".repeat(Number(i.rating)||0)} — ${i.text}`)).join("")}
+load();
+</script></body></html>
