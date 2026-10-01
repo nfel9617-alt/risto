@@ -1,0 +1,49 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>El Padre Burgers</title><link rel="stylesheet" href="style.css"></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="menu" viewBox="0 0 24 24"><path d="M4 11a8 6 0 0116 0z"/><path d="M3 15h18"/><path d="M5 19h14a2 2 0 002-2v-2H3v2a2 2 0 002 2z"/></symbol>
+<symbol id="comments" viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-11.5 7.2L3 21l1.8-6A8 8 0 1121 12z"/></symbol>
+<symbol id="delivery" viewBox="0 0 24 24"><circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M9 17h6M6 14l3-7h4l2 4h3M13 7h2"/></symbol>
+<symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></symbol>
+<symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></symbol>
+<symbol id="pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 005 9.5C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.500" r="2.500"/></symbol>
+<symbol id="send" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></symbol>
+</defs></svg>
+<aside><div class="brand"><div class="logo">🍔</div><b>El Padre<br>Burgers</b></div>
+<button data-p="menu" class="on"><svg class="i"><use href="#menu"/></svg>Menu</button>
+<button data-p="comments"><svg class="i"><use href="#comments"/></svg>Comments</button>
+<button data-p="delivery"><svg class="i"><use href="#delivery"/></svg>Delivery</button>
+<div class="foot">Fait maison, servi chaud.</div></aside>
+<main id="m"><div class="grid"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div></main>
+<script src="config.js"></script><script>
+const EM={"Burgers":"🍔","Sandwichs":"🥪","Menu Enfant":"🧸","Tacos":"🌮","Salade":"🥗","Bowl":"🥣","Pizzas":"🍕","Boissons":"🥤"};
+let D={menu:[],comments:[],agencies:[]},page="menu",cat=CATS[0],q="";
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ic=n=>`<svg class="i"><use href="#${n}"/></svg>`;
+const m=document.getElementById("m");
+document.querySelectorAll("aside button").forEach(b=>b.onclick=()=>{page=b.dataset.p;document.querySelectorAll("aside button").forEach(x=>x.classList.toggle("on",x==b));draw();scrollTo(0,0)});
+function draw(){
+ if(page=="menu"){
+  const all=D.menu.filter(i=>i.category==cat&&i.name.toLowerCase().includes(q));
+  const f=D.menu.find(i=>i.image);
+  m.innerHTML=`<div class="hero"><div><h1>Des burgers qui parlent d'eux-mêmes.</h1><p>Choisissez, appelez, on livre.</p></div>${f?`<img src="${esc(f.image)}" alt="">`:`<div class="em">🍔</div>`}</div>
+  <div class="tools"><label class="search">${ic("search")}<input id="q" placeholder="Rechercher un plat" value="${esc(q)}"></label></div>
+  <div class="cats">${CATS.map(c=>`<button class="cat ${c==cat?"on":""}" data-c="${c}"><span>${EM[c]||"🍽️"}</span>${c}</button>`).join("")}</div>
+  <div class="grid">${all.map(i=>`<div class="card"><div class="ph">${i.image?`<img src="${esc(i.image)}" alt="${esc(i.name)}" loading="lazy">`:EM[i.category]||"🍽️"}</div><h3>${esc(i.name)}</h3>
+  <div class="row2"><span class="price">${esc(i.price)} <small>DA</small></span><span class="add">${ic("plus")}</span></div></div>`).join("")||'<p class="empty">Aucun plat dans cette catégorie.</p>'}</div>`;
+  m.querySelectorAll(".cat").forEach(b=>b.onclick=()=>{cat=b.dataset.c;draw()});
+  const qi=document.getElementById("q");qi.oninput=()=>{q=qi.value.toLowerCase();const p=qi.selectionStart;draw();const n=document.getElementById("q");n.focus();n.setSelectionRange(p,p)};
+ }else if(page=="comments"){
+  m.innerHTML=`<h2>Comments</h2><div class="form"><select id="w">${WILAYAS.map(w=>`<option>${w}</option>`).join("")}</select>
+  <textarea id="t" rows="3" maxlength="300" placeholder="Votre avis…"></textarea><button class="send" id="s">${ic("send")}Envoyer</button></div>
+  ${D.comments.slice().reverse().map(c=>`<div class="bub"><div class="av">${esc(String(c.wilaya)[0]||"?")}</div><div><b>${esc(c.wilaya)}</b><p>${esc(c.text)}</p></div></div>`).join("")||'<p class="empty">Soyez le premier à commenter.</p>'}`;
+  document.getElementById("s").onclick=async e=>{const t=document.getElementById("t").value.trim();if(!t)return;e.target.disabled=true;
+   await api.post({action:"comment",wilaya:document.getElementById("w").value,text:t});D=await api.get();draw()};
+ }else{
+  m.innerHTML=`<h2>Delivery <span class="cnt">${D.agencies.length} agences</span></h2><div class="grid">${D.agencies.map(a=>`<div class="card"><div class="ph">${a.image?`<img src="${esc(a.image)}" alt="" loading="lazy">`:"📍"}</div><h3>${esc(a.wilaya)}</h3>
+  <div class="btns"><a class="btn" href="tel:${esc(a.phone)}">${ic("phone")}Appeler</a>${a.location?`<a class="btn d" href="${esc(a.location)}" target="_blank" rel="noopener">${ic("pin")}Location</a>`:""}</div>
+  <p style="margin:8px 6px 4px;color:var(--g);font-size:14px">${esc(a.phone)}</p></div>`).join("")||'<p class="empty">Aucune agence pour le moment.</p>'}</div>`;
+ }}
+api.get().then(d=>{D=d;draw()}).catch(()=>m.innerHTML='<p class="empty">Erreur de connexion à la base de données.</p>');
+</script></body></html>
